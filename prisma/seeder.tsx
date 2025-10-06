@@ -1,22 +1,22 @@
 import { PrismaClient } from "@prisma/client";
+import fs from "fs";
 
+const dbPath = "/tmp/dev.db";
 const prisma = new PrismaClient();
 
 export async function ensureDatabaseSeeded() {
-    const existingUsers = await prisma.user.count();
+    // Alleen seeden als database file nog niet bestaat
+    if (!fs.existsSync(dbPath)) {
+        console.log("🌱 Creating new SQLite DB at /tmp/dev.db");
 
-    if (existingUsers === 0) {
-        console.log("🌱 Seeding database...");
-
-        // Users
+        // Omdat file nog niet bestaat, Prisma kan opslaan
         await prisma.user.createMany({
             data: [
-                { id: 1, email: "user1@example.com", password: "1234" },
-                { id: 2, email: "user2@example.com", password: "1234" },
+                { email: "user1@example.com", password: "1234" },
+                { email: "user2@example.com", password: "1234" },
             ],
         });
 
-        // Categories
         await prisma.category.createMany({
             data: [
                 { userId: 1, name: "Boodschappen" },
@@ -34,6 +34,6 @@ export async function ensureDatabaseSeeded() {
 
         console.log("✅ Database seeded!");
     } else {
-        console.log("✅ Database already seeded, skipping.");
+        console.log("✅ Database already exists, skipping seeding.");
     }
 }
