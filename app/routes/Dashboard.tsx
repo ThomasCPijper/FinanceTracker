@@ -7,16 +7,13 @@ import {getSession} from "~/session.server";
 
 // ===== Loader =====
 export async function loader({ request }: LoaderFunctionArgs) {
-    // ✅ Haal de session op
     const session = await getSession(request);
     const userId = session.get("userId");
 
-    // ✅ Beveiliging: alleen ingelogde users
     if (!userId) {
         throw new Response("Unauthorized", { status: 401 });
     }
-
-    const userIdNumber = Number(userId); // ✅ Heel belangrijk: convert naar number
+    const userIdNumber = Number(userId);
 
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get("page") || "1", 10);
