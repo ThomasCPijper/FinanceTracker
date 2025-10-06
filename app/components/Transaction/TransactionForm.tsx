@@ -1,5 +1,7 @@
 import {Form, useNavigation} from "@remix-run/react";
 import {useEffect, useState} from "react";
+import {DatePicker} from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 interface TransactionFormProps {
     categories: string[];
@@ -7,6 +9,7 @@ interface TransactionFormProps {
 
 export default function TransactionForm({ categories }: TransactionFormProps) {
     const [isOpen, setIsOpen] = useState(false);
+    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -89,12 +92,19 @@ export default function TransactionForm({ categories }: TransactionFormProps) {
                                 </select>
                             </div>
 
-                            <input
-                                type="date"
-                                name="date"
-                                required
-                                className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
+                            <DatePicker
+                                selected={selectedDate}
+                                onChange={(date) => setSelectedDate(date)}
+                                dateFormat="dd/MM/yyyy"
+                                className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white w-full"
                             />
+                            {/* Hidden input zodat Remix de datum kan submitten */}
+                            <input
+                                type="hidden"
+                                name="date"
+                                value={selectedDate ? selectedDate.toISOString().substring(0, 10) : ""}
+                            />
+
                             <input
                                 type="text"
                                 name="description"

@@ -1,4 +1,4 @@
-import { Link } from "@remix-run/react";
+import NavButton from "./NavButton";
 
 export default function Navbar() {
     return (
@@ -6,8 +6,8 @@ export default function Navbar() {
             <h1 className="text-2xl font-bold text-indigo-600">Finance Dashboard</h1>
 
             <nav className="flex flex-col gap-2">
-                <Link to="/dashboard" className="hover:text-indigo-500">Dashboard</Link>
-                <Link to="/categories" className="hover:text-indigo-500">Categories</Link>
+                <NavButton to="/dashboard" label="Dashboard" />
+                <NavButton to="/categories" label="Categories" />
             </nav>
         </aside>
     );

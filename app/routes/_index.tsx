@@ -1,24 +1,28 @@
 import { ActionFunctionArgs, redirect } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
+import {prisma} from "~/utils/prisma.server";
+import {commitSession, getSession} from "~/session.server";
 
-// ⬇️ Server-side actie: wordt uitgevoerd bij form submit
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const email = formData.get("email");
   const password = formData.get("password");
 
-  // Simpele validatie
-  if (typeof email !== "string" || typeof password !== "string") {
-    return { error: "Ongeldige invoer." };
+  const user = await prisma.user.findFirst({ where: { email } });
+
+  if (!user || user.password !== password) {
+    return { error: "Onjuiste inloggegevens." };
   }
 
-  // Dummy login check (vervang dit met je eigen authenticatie)
-  if (email === "56thomasp56@gmail.com" && password === "test123") {
-    // Hier kun je een session aanmaken
-    return redirect("/dashboard");
-  }
+  // ✅ Session maken
+  const session = await getSession(request);
+  session.set("userId", user.id);
 
-  return { error: "Onjuiste inloggegevens." };
+  return redirect("/dashboard", {
+    headers: {
+      "Set-Cookie": await commitSession(session),
+    },
+  });
 }
 
 // ⬇️ Client-side UI component

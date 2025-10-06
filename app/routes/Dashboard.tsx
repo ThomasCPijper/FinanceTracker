@@ -3,28 +3,59 @@ import { useLoaderData } from "@remix-run/react";
 import DashboardSummary from "~/components/Transaction/DashboardSummary";
 import TransactionList from "~/components/Transaction/TransactionList";
 import { prisma } from "~/utils/prisma.server";
+import {getSession} from "~/session.server";
 
 // ===== Loader =====
 export async function loader({ request }: LoaderFunctionArgs) {
+    // ✅ Haal de session op
+    const session = await getSession(request);
+    const userId = session.get("userId");
+
+    // ✅ Beveiliging: alleen ingelogde users
+    if (!userId) {
+        throw new Response("Unauthorized", { status: 401 });
+    }
+
+    const userIdNumber = Number(userId); // ✅ Heel belangrijk: convert naar number
+
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get("page") || "1", 10);
     const perPage = parseInt(url.searchParams.get("perPage") || "10", 10);
 
-    const totalTransactions = await prisma.transaction.count();
+    // totaal aantal transacties voor deze user
+    const totalTransactions = await prisma.transaction.count({
+        where: { userId: userIdNumber },
+    });
 
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1); // 1e dag van de maand
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+    // totaal inkomsten deze maand
     const totalIncomeAggregate = await prisma.transaction.aggregate({
         _sum: { amount: true },
-        where: { type: "income" },
+        where: {
+            userId: userIdNumber,
+            type: "income",
+            date: { gte: startOfMonth, lte: endOfMonth },
+        },
     });
     const totalIncome = totalIncomeAggregate._sum.amount ?? 0;
 
+    // totaal uitgaven deze maand
     const totalExpenseAggregate = await prisma.transaction.aggregate({
         _sum: { amount: true },
-        where: { type: "expense" },
+        where: {
+            userId: userIdNumber,
+            type: "expense",
+            date: { gte: startOfMonth, lte: endOfMonth },
+        },
     });
     const totalExpense = totalExpenseAggregate._sum.amount ?? 0;
 
+    // transacties ophalen voor deze user, met pagination
     const transactions = await prisma.transaction.findMany({
+        where: { userId: userIdNumber },
         orderBy: { date: "desc" },
         skip: (page - 1) * perPage,
         take: perPage,
@@ -45,9 +76,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function action({ request }: ActionFunctionArgs) {
     const formData = await request.formData();
     const intent = formData.get("intent");
+    const session = await getSession(request);
 
     switch (intent) {
         case "create-transaction": {
+            const userId = session.get("userId") as string;
             const amount = parseFloat(formData.get("amount") as string);
             const currency = formData.get("currency") as string;
             const category = formData.get("category") as string;
@@ -56,7 +89,7 @@ export async function action({ request }: ActionFunctionArgs) {
             const description = formData.get("description") as string;
 
             await prisma.transaction.create({
-                data: { amount, currency, category, type, date, description },
+                data: { userId, amount, currency, category, type, date, description },
             });
             break;
         }
@@ -67,13 +100,13 @@ export async function action({ request }: ActionFunctionArgs) {
             const id = parseInt(idStr, 10);
 
             await prisma.transaction.delete({
-                where: { id },
+                where: { id: id },
             });
             break;
         }
     }
 
-    return redirect("/");
+    return redirect("/dashboard");
 }
 
 export default function Dashboard() {

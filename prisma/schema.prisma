@@ -9,6 +9,7 @@ datasource db {
 
 model Transaction {
   id          Int      @id @default(autoincrement())
+  userId      Int
   amount      Float
   currency    String
   category    String
@@ -21,4 +22,10 @@ model Transaction {
 model Category {
   id          Int     @id @default(autoincrement())
   name        String
+}
+
+model User {
+  id          Int   @id @default(autoincrement())
+  email       String
+  password    String
 }
