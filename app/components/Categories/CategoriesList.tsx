@@ -1,6 +1,15 @@
 import {Form} from "@remix-run/react";
 
-export default function CategoriesList() {
+interface Category {
+    id: number;
+    name: string;
+}
+
+interface CategoriesListProps {
+    categories: Category[]
+}
+
+export default function CategoriesList({categories}: CategoriesListProps) {
     return (
         <div className="bg-white shadow-md rounded-xl p-4 relative grid grid-rows-[auto_1fr_auto] h-full max-h-screen">
             {/* header */}
@@ -39,22 +48,30 @@ export default function CategoriesList() {
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50 sticky top-0 z-10">
                         <tr>
-                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">Datum</th>
-                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">Type</th>
-                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">Categorie</th>
-                            <th className="px-4 py-2 text-right text-sm font-medium text-gray-500 uppercase">Bedrag</th>
-                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">Valuta</th>
-                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">Beschrijving</th>
-                            <th className="px-4 py-2 text-center text-sm font-medium text-gray-500 uppercase">Acties</th>
+                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">Name</th>
                         </tr>
                         </thead>
 
                         <tbody className="divide-y divide-gray-200">
+                        {categories.length > 0 ? (
+                            categories.map((t) => (
+                                <tr key={t.id} className="hover:bg-gray-50">
+                                    <td className="px-4 py-3 flex justify-between items-center text-sm text-gray-700">
+                                        {t.name}
+                                        <button
+                                            className="text-red-600 hover:text-red-800 text-sm font-medium">
+                                            Verwijderen
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
                             <tr>
                                 <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
                                     Geen transacties gevonden
                                 </td>
                             </tr>
+                        )}
                         </tbody>
                     </table>
                 </div>

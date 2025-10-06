@@ -1,4 +1,3 @@
-// app/root.tsx
 import type { LinksFunction } from "@remix-run/node";
 import {
     Links,
@@ -7,6 +6,7 @@ import {
     Outlet,
     Scripts,
     ScrollRestoration,
+    useLocation,
 } from "@remix-run/react";
 import appStylesHref from "./tailwind.css?url";
 import Navbar from "~/components/nav/NavBar";
@@ -16,6 +16,9 @@ export const links: LinksFunction = () => [
 ];
 
 export default function App() {
+    const location = useLocation();
+    const isIndexPage = location.pathname === "/";
+
     return (
         <html lang="en">
         <head>
@@ -24,13 +27,10 @@ export default function App() {
             <Links />
         </head>
         <body className="text-gray-900">
-        {/* Wrapper div voor responsive layout en background */}
-        <div className="flex flex-col sm:flex-row min-h-screen bg-gray-100 sm:bg-amber-500">
-            {/* Navbar */}
-            <Navbar />
-
-            {/* Main content */}
-            <main className="flex-1 p-6 space-y-8 overflow-y-auto">
+        <div className="flex flex-col sm:flex-row min-h-screen bg-gray-100">
+            {/* ✅ Only render Navbar if NOT on index page */}
+            {!isIndexPage && <Navbar />}
+            <main className="flex-1 space-y-8 overflow-y-auto">
                 <Outlet />
             </main>
         </div>
