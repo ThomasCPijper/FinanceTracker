@@ -1,5 +1,6 @@
 import {Form} from "@remix-run/react";
 import Paginator from "~/components/common/Paginator";
+import CategoryForm from "~/components/Categories/CategoryForm";
 
 interface Category {
     id: number;
@@ -17,15 +18,18 @@ export default function CategoriesList({categories, page, perPage, totalCategori
     return (
         <div className="bg-white shadow-md rounded-xl p-4 relative grid grid-rows-[auto_1fr_auto] h-full max-h-screen">
             {/* header */}
-            <div className="flex items-center justify-between mb-2">
-            <h2 className="text-xl font-semibold text-indigo-600">Categories</h2>
+            <div className="flex items-center justify-between mb-2 gap-4">
+                <h2 className="text-xl font-semibold text-indigo-600">Categories</h2>
+
                 <div className="flex items-center gap-3">
+                    <CategoryForm></CategoryForm>
+
                     <Form method="get" className="flex items-center gap-2">
-                        <input type="hidden" name="page" value="1"/>
+                        <input type="hidden" name="page" value="1" />
                         <div className="inline-block relative w-16">
                             <select
                                 name="perPage"
-                                defaultValue={1}
+                                defaultValue={perPage}
                                 onChange={(e) => e.currentTarget.form?.submit()}
                                 className="appearance-none w-full border border-gray-400 px-3 py-2 rounded-md bg-white focus:outline-none focus:border-gray-500 focus:ring-0"
                             >
@@ -36,9 +40,7 @@ export default function CategoriesList({categories, page, perPage, totalCategori
                                 ))}
                             </select>
 
-                            {/* Custom pijltje */}
-                            <div
-                                className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                                 ▼
                             </div>
                         </div>
@@ -82,7 +84,6 @@ export default function CategoriesList({categories, page, perPage, totalCategori
             </div>
 
             <Paginator page={page} perPage={perPage} totalItems={totalCategories} />
-
         </div>
     );
 }

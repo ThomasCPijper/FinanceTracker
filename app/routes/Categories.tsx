@@ -1,5 +1,5 @@
 import CategoriesList from "~/components/Categories/CategoriesList";
-import {json, LoaderFunctionArgs} from "@remix-run/node";
+import {ActionFunctionArgs, json, LoaderFunctionArgs, redirect} from "@remix-run/node";
 import {prisma} from "~/utils/prisma.server";
 import {useLoaderData} from "@remix-run/react";
 import {getSession} from "~/session.server";
@@ -35,6 +35,33 @@ export async function loader({ request }: LoaderFunctionArgs) {
         categories,
         totalCategories
     });
+}
+
+// ===== Action =====
+export async function action({ request }: ActionFunctionArgs) {
+    const formData = await request.formData();
+    const intent = formData.get("intent");
+    const session = await getSession(request);
+
+    switch (intent) {
+        case "create-category": {
+            const userId = session.get("userId") as string;
+            const currency = formData.get("currency") as string;
+            const name = formData.get("name") as string;
+
+            await prisma.category.create({ data: { userId, name } });
+            break;
+        }
+        case "delete-category": {
+            const idStr = formData.get("id") as string;
+            if (!idStr) throw new Error("Geen ID meegegeven voor verwijderen");
+            const id = parseInt(idStr, 10);
+            await prisma.category.delete({ where: { id } });
+            break;
+        }
+    }
+
+    return redirect("/categories");
 }
 
 export default function CategoryDashboard() {
