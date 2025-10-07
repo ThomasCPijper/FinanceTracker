@@ -1,6 +1,8 @@
 import {Form} from "@remix-run/react";
 import Paginator from "~/components/common/Paginator";
 import CategoryForm from "~/components/Categories/CategoryForm";
+import {useState} from "react";
+import DeleteModal from "~/components/common/DeleteModal";
 
 interface Category {
     id: number;
@@ -15,6 +17,8 @@ interface CategoriesListProps {
 }
 
 export default function CategoriesList({categories, page, perPage, totalCategories}: CategoriesListProps) {
+    const [deleteId, setDeleteId] = useState<number | null>(null);
+
     return (
         <div className="bg-white shadow-md rounded-xl p-4 relative grid grid-rows-[auto_1fr_auto] h-full max-h-screen">
             {/* header */}
@@ -65,6 +69,7 @@ export default function CategoriesList({categories, page, perPage, totalCategori
                                     <td className="px-4 py-3 flex justify-between items-center text-sm text-gray-700">
                                         {t.name}
                                         <button
+                                            onClick={() => setDeleteId(t.id)}
                                             className="text-red-600 hover:text-red-800 text-sm font-medium">
                                             Verwijderen
                                         </button>
@@ -83,7 +88,11 @@ export default function CategoriesList({categories, page, perPage, totalCategori
                 </div>
             </div>
 
-            <Paginator page={page} perPage={perPage} totalItems={totalCategories} />
+            <DeleteModal
+                isOpen={deleteId !== null}
+                categoryId={deleteId || undefined}
+                onClose={() => setDeleteId(null)}
+            />
         </div>
     );
 }

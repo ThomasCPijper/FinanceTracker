@@ -112,7 +112,11 @@ export default function TransactionList({
 
             <Paginator page={page} perPage={perPage} totalItems={totalTransactions} />
 
-            {deleteId !== null && <DeleteModal transactionId={deleteId} onClose={() => setDeleteId(null)} />}
+            <DeleteModal
+                isOpen={deleteId !== null}
+                transactionId={deleteId || undefined}
+                onClose={() => setDeleteId(null)}
+            />
         </div>
     );
 }
