@@ -28,9 +28,6 @@ COPY --from=builder /app/build ./build
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/package*.json ./
 
-# Copy SQLite database (optioneel, als je lokaal seedt)
-COPY --from=builder /app/dev.db ./dev.db
-
 # Generate Prisma client again (optional safeguard)
 RUN npx prisma generate
 
