@@ -4,63 +4,82 @@ import { createReadableStreamFromReadable } from "@remix-run/node";
 import { RemixServer } from "@remix-run/react";
 import { isbot } from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
-import {ensureDatabaseSeeded} from "../prisma/seeder";
+import { ensureDatabaseSeeded } from "../prisma/seeder";
 
 const ABORT_DELAY = 5000;
 
-await ensureDatabaseSeeded()
+// Zet seeding in een async init functie
+async function init() {
+    await ensureDatabaseSeeded();
 
-export default function handleRequest(
+    return function handleRequest(
+        request: Request,
+        responseStatusCode: number,
+        responseHeaders: Headers,
+        remixContext: EntryContext,
+        loadContext: AppLoadContext
+    ) {
+        return isbot(request.headers.get("user-agent") || "")
+            ? handleBotRequest(request, responseStatusCode, responseHeaders, remixContext)
+            : handleBrowserRequest(request, responseStatusCode, responseHeaders, remixContext);
+    };
+}
+
+// Exporteer een placeholder die later ingevuld wordt
+let handleRequestFn: typeof init;
+export default async function entryHandleRequest(
     request: Request,
     responseStatusCode: number,
     responseHeaders: Headers,
     remixContext: EntryContext,
     loadContext: AppLoadContext
 ) {
-  return isbot(request.headers.get("user-agent") || "")
-      ? handleBotRequest(request, responseStatusCode, responseHeaders, remixContext)
-      : handleBrowserRequest(request, responseStatusCode, responseHeaders, remixContext);
+    if (!handleRequestFn) {
+        handleRequestFn = await init();
+    }
+    return handleRequestFn(request, responseStatusCode, responseHeaders, remixContext, loadContext);
 }
 
+// --- onderstaande functies blijven hetzelfde ---
 async function handleBotRequest(
     request: Request,
     responseStatusCode: number,
     responseHeaders: Headers,
     remixContext: EntryContext
 ) {
-  return new Promise((resolve, reject) => {
-    let shellRendered = false;
-    const { pipe, abort } = renderToPipeableStream(
-        <RemixServer context={remixContext} url={request.url} abortDelay={ABORT_DELAY} />,
-        {
-          onAllReady() {
-            shellRendered = true;
-            const body = new PassThrough();
-            const stream = createReadableStreamFromReadable(body);
+    return new Promise((resolve, reject) => {
+        let shellRendered = false;
+        const { pipe, abort } = renderToPipeableStream(
+            <RemixServer context={remixContext} url={request.url} abortDelay={ABORT_DELAY} />,
+            {
+                onAllReady() {
+                    shellRendered = true;
+                    const body = new PassThrough();
+                    const stream = createReadableStreamFromReadable(body);
 
-            responseHeaders.set("Content-Type", "text/html");
+                    responseHeaders.set("Content-Type", "text/html");
 
-            resolve(
-                new Response(stream, {
-                  headers: responseHeaders,
-                  status: responseStatusCode,
-                })
-            );
+                    resolve(
+                        new Response(stream, {
+                            headers: responseHeaders,
+                            status: responseStatusCode,
+                        })
+                    );
 
-            pipe(body);
-          },
-          onShellError(error) {
-            reject(error);
-          },
-          onError(error) {
-            responseStatusCode = 500;
-            if (shellRendered) console.error(error);
-          },
-        }
-    );
+                    pipe(body);
+                },
+                onShellError(error) {
+                    reject(error);
+                },
+                onError(error) {
+                    responseStatusCode = 500;
+                    if (shellRendered) console.error(error);
+                },
+            }
+        );
 
-    setTimeout(abort, ABORT_DELAY);
-  });
+        setTimeout(abort, ABORT_DELAY);
+    });
 }
 
 async function handleBrowserRequest(
@@ -69,37 +88,37 @@ async function handleBrowserRequest(
     responseHeaders: Headers,
     remixContext: EntryContext
 ) {
-  return new Promise((resolve, reject) => {
-    let shellRendered = false;
-    const { pipe, abort } = renderToPipeableStream(
-        <RemixServer context={remixContext} url={request.url} abortDelay={ABORT_DELAY} />,
-        {
-          onShellReady() {
-            shellRendered = true;
-            const body = new PassThrough();
-            const stream = createReadableStreamFromReadable(body);
+    return new Promise((resolve, reject) => {
+        let shellRendered = false;
+        const { pipe, abort } = renderToPipeableStream(
+            <RemixServer context={remixContext} url={request.url} abortDelay={ABORT_DELAY} />,
+            {
+                onShellReady() {
+                    shellRendered = true;
+                    const body = new PassThrough();
+                    const stream = createReadableStreamFromReadable(body);
 
-            responseHeaders.set("Content-Type", "text/html");
+                    responseHeaders.set("Content-Type", "text/html");
 
-            resolve(
-                new Response(stream, {
-                  headers: responseHeaders,
-                  status: responseStatusCode,
-                })
-            );
+                    resolve(
+                        new Response(stream, {
+                            headers: responseHeaders,
+                            status: responseStatusCode,
+                        })
+                    );
 
-            pipe(body);
-          },
-          onShellError(error) {
-            reject(error);
-          },
-          onError(error) {
-            responseStatusCode = 500;
-            if (shellRendered) console.error(error);
-          },
-        }
-    );
+                    pipe(body);
+                },
+                onShellError(error) {
+                    reject(error);
+                },
+                onError(error) {
+                    responseStatusCode = 500;
+                    if (shellRendered) console.error(error);
+                },
+            }
+        );
 
-    setTimeout(abort, ABORT_DELAY);
-  });
+        setTimeout(abort, ABORT_DELAY);
+    });
 }
