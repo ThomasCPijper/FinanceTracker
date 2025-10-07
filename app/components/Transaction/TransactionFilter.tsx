@@ -1,77 +1,80 @@
 import { useState } from "react";
-
-interface FilterData {
-    type: string;
-    category: string;
-    date: string;
-}
+import SafeDatePicker from "~/components/common/SafeDatePicker";
+import {Category} from "@prisma/client";
 
 interface TransactionFilterProps {
-    onFilter: (data: FilterData) => void;
+    initialStart?: Date;
+    initialEnd?: Date;
+    initialCategory?: string;
+    initialType?: "income" | "expense";
+    categories?: Category[];
 }
 
-export default function TransactionFilter({ onFilter }: TransactionFilterProps) {
-    const [type, setType] = useState("");
-    const [category, setCategory] = useState("");
-    const [date, setDate] = useState("");
-    const [expanded, setExpanded] = useState(false);
-
-    const handleFilter = () => {
-        onFilter({ type, category, date });
-    };
-
-    // Tel het aantal actieve filters
-    const activeFilters = [type, category, date].filter(Boolean).length;
+export default function TransactionFilter({
+                                              initialStart,
+                                              initialEnd,
+                                              initialCategory,
+                                              initialType,
+                                              categories = [],
+                                          }: TransactionFilterProps) {
+    const [startDate, setStartDate] = useState<Date | null>(initialStart || null);
+    const [endDate, setEndDate] = useState<Date | null>(initialEnd || null);
+    const [category, setCategory] = useState<string | "">(
+        initialCategory || ""
+    );
+    const [type, setType] = useState<"income" | "expense" | "">(
+        initialType || ""
+    );
 
     return (
-        <div className="flex flex-col gap-2">
-            {/* Filter badge */}
-            <div
-                onClick={() => setExpanded(!expanded)}
-                className="flex items-center justify-between bg-gray-200 hover:bg-gray-300 cursor-pointer rounded-md px-4 py-2"
+        <form method="get" className="flex gap-2 items-center flex-wrap">
+            <SafeDatePicker selected={startDate} onChange={setStartDate} />
+            <input
+                type="hidden"
+                name="dateStart"
+                value={startDate ? startDate.toISOString().substring(0, 10) : ""}
+            />
+
+            <SafeDatePicker selected={endDate} onChange={setEndDate} />
+            <input
+                type="hidden"
+                name="dateEnd"
+                value={endDate ? endDate.toISOString().substring(0, 10) : ""}
+            />
+
+            <select
+                name="category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
             >
-        <span className="font-medium text-gray-700">
-          Filters ({activeFilters})
-        </span>
-                <span className="text-gray-500">{expanded ? "▲" : "▼"}</span>
-            </div>
+                <option value="">All Categories</option>
+                {categories.map((cat) => (
+                    <option key={cat.id} value={cat.name}>
+                        {cat.name}
+                    </option>
+                ))}
+            </select>
 
-            {/* Uitklapbare filtervelden */}
-            {expanded && (
-                <div className="flex flex-col gap-2 mt-2 bg-white p-4 rounded-md shadow-md">
-                    <select
-                        value={type}
-                        onChange={(e) => setType(e.target.value)}
-                        className="bg-white border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                    >
-                        <option value="">Alle types</option>
-                        <option value="income">Inkomen</option>
-                        <option value="expense">Uitgave</option>
-                    </select>
+            <select
+                name="type"
+                value={type}
+                onChange={(e) =>
+                    setType(e.target.value === "" ? "" : (e.target.value as "income" | "expense"))
+                }
+                className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
+            >
+                <option value="">All Types</option>
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+            </select>
 
-                    <input
-                        type="text"
-                        placeholder="Categorie"
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                        className="bg-white border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                    />
-
-                    <input
-                        type="month"
-                        value={date}
-                        onChange={(e) => setDate(e.target.value)}
-                        className="bg-white border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                    />
-
-                    <button
-                        onClick={handleFilter}
-                        className="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
-                    >
-                        Filteren
-                    </button>
-                </div>
-            )}
-        </div>
+            <button
+                type="submit"
+                className="px-3 py-1 bg-indigo-600 text-white rounded"
+            >
+                Filter
+            </button>
+        </form>
     );
 }

@@ -1,4 +1,5 @@
 import {Form} from "@remix-run/react";
+import Paginator from "~/components/common/Paginator";
 
 interface Category {
     id: number;
@@ -6,10 +7,13 @@ interface Category {
 }
 
 interface CategoriesListProps {
-    categories: Category[]
+    categories: Category[];
+    page: number;
+    perPage: number;
+    totalCategories: number;
 }
 
-export default function CategoriesList({categories}: CategoriesListProps) {
+export default function CategoriesList({categories, page, perPage, totalCategories}: CategoriesListProps) {
     return (
         <div className="bg-white shadow-md rounded-xl p-4 relative grid grid-rows-[auto_1fr_auto] h-full max-h-screen">
             {/* header */}
@@ -68,7 +72,7 @@ export default function CategoriesList({categories}: CategoriesListProps) {
                         ) : (
                             <tr>
                                 <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
-                                    Geen transacties gevonden
+                                    No categories found
                                 </td>
                             </tr>
                         )}
@@ -76,6 +80,9 @@ export default function CategoriesList({categories}: CategoriesListProps) {
                     </table>
                 </div>
             </div>
+
+            <Paginator page={page} perPage={perPage} totalItems={totalCategories} />
+
         </div>
     );
 }

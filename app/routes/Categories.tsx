@@ -25,20 +25,25 @@ export async function loader({ request }: LoaderFunctionArgs) {
         take: perPage,
     });
 
+    const totalCategories = await prisma.category.count({
+        where: { userId: userIdNumber },
+    });
+
     return json({
         page,
         perPage,
-        categories
+        categories,
+        totalCategories
     });
 }
 
 export default function CategoryDashboard() {
-    const { categories } =
+    const { categories, totalCategories, page, perPage } =
         useLoaderData<typeof loader>();
 
     return (
         <div className="h-[100vh] p-8 flex flex-col gap-6">
-            <CategoriesList categories={categories} ></CategoriesList>
+            <CategoriesList categories={categories} page={page} perPage={perPage} totalCategories={totalCategories}></CategoriesList>
         </div>
     );
 }
