@@ -88,6 +88,8 @@ export default function CategoriesList({categories, page, perPage, totalCategori
                 </div>
             </div>
 
+            <Paginator page={page} perPage={perPage} totalItems={totalCategories} />
+
             <DeleteModal
                 isOpen={deleteId !== null}
                 categoryId={deleteId || undefined}

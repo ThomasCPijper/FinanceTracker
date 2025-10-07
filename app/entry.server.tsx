@@ -4,43 +4,22 @@ import { createReadableStreamFromReadable } from "@remix-run/node";
 import { RemixServer } from "@remix-run/react";
 import { isbot } from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
-import { ensureDatabaseSeeded } from "../prisma/seeder";
 
 const ABORT_DELAY = 5000;
 
-// Zet seeding in een async init functie
-async function init() {
-    await ensureDatabaseSeeded();
 
-    return function handleRequest(
-        request: Request,
-        responseStatusCode: number,
-        responseHeaders: Headers,
-        remixContext: EntryContext,
-        loadContext: AppLoadContext
-    ) {
-        return isbot(request.headers.get("user-agent") || "")
-            ? handleBotRequest(request, responseStatusCode, responseHeaders, remixContext)
-            : handleBrowserRequest(request, responseStatusCode, responseHeaders, remixContext);
-    };
-}
-
-// Exporteer een placeholder die later ingevuld wordt
-let handleRequestFn: typeof init;
-export default async function entryHandleRequest(
+export default function handleRequest(
     request: Request,
     responseStatusCode: number,
     responseHeaders: Headers,
     remixContext: EntryContext,
     loadContext: AppLoadContext
 ) {
-    if (!handleRequestFn) {
-        handleRequestFn = await init();
-    }
-    return handleRequestFn(request, responseStatusCode, responseHeaders, remixContext, loadContext);
+    return isbot(request.headers.get("user-agent") || "")
+        ? handleBotRequest(request, responseStatusCode, responseHeaders, remixContext)
+        : handleBrowserRequest(request, responseStatusCode, responseHeaders, remixContext);
 }
 
-// --- onderstaande functies blijven hetzelfde ---
 async function handleBotRequest(
     request: Request,
     responseStatusCode: number,
