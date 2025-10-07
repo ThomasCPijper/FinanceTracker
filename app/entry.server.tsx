@@ -8,6 +8,8 @@ import {ensureDatabaseSeeded} from "../prisma/seeder";
 
 const ABORT_DELAY = 5000;
 
+await ensureDatabaseSeeded()
+
 export default function handleRequest(
     request: Request,
     responseStatusCode: number,
@@ -26,9 +28,6 @@ async function handleBotRequest(
     responseHeaders: Headers,
     remixContext: EntryContext
 ) {
-  // Seeder aanroepen bij elke request (idempotent)
-  await ensureDatabaseSeeded();
-
   return new Promise((resolve, reject) => {
     let shellRendered = false;
     const { pipe, abort } = renderToPipeableStream(
@@ -70,9 +69,6 @@ async function handleBrowserRequest(
     responseHeaders: Headers,
     remixContext: EntryContext
 ) {
-  // Seeder aanroepen bij elke request (idempotent)
-  await ensureDatabaseSeeded();
-
   return new Promise((resolve, reject) => {
     let shellRendered = false;
     const { pipe, abort } = renderToPipeableStream(
