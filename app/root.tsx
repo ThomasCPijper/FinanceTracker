@@ -27,16 +27,17 @@ export default function App() {
             <Links />
         </head>
         <body className="text-gray-900">
-        <div className="flex flex-col sm:flex-row min-h-screen bg-gray-100">
-            {!isIndexPage && <Navbar />}
+        <div className="flex flex-col sm:flex-row min-h-fit sm:min-h-screen bg-gray-100">
+            {!isIndexPage && <Navbar/>}
             <main className="flex-1 space-y-8 overflow-y-auto">
-                <Outlet />
+                <Outlet/>
             </main>
         </div>
 
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
+
+        <ScrollRestoration/>
+        <Scripts/>
+        <LiveReload/>
         </body>
         </html>
     );

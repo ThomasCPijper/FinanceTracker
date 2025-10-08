@@ -2,7 +2,7 @@ import NavButton from "./NavButton";
 
 export default function Navbar() {
     return (
-        <aside className="w-full sm:w-72 bg-white shadow-lg p-6 flex flex-col h-screen">
+        <aside className="w-full sm:w-72 bg-white shadow-lg p-6 flex flex-col h-fit sm:h-screen">
             {/* Header */}
             <h1 className="text-2xl font-bold text-indigo-600 mb-6">Finance Dashboard</h1>
 
