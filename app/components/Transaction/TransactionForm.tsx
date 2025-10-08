@@ -5,16 +5,16 @@ import {Category} from "@prisma/client";
 
 interface TransactionFormProps {
     categories: Category[];
+    defaultCurrency: string;
 }
 
-export default function TransactionForm({ categories }: TransactionFormProps) {
+export default function TransactionForm({ categories, defaultCurrency }: TransactionFormProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
     const navigation = useNavigation();
 
     useEffect(() => {
         if (navigation.state === "idle") {
-            // na submit en redirect
             setIsOpen(false);
         }
     }, [navigation.state]);
@@ -56,7 +56,7 @@ export default function TransactionForm({ categories }: TransactionFormProps) {
                                 <input
                                     type="text"
                                     name="currency"
-                                    defaultValue="EUR"
+                                    defaultValue={defaultCurrency}
                                     className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
                                 />
                             </div>

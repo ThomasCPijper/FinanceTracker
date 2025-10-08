@@ -91,7 +91,7 @@ export default function TransactionList({
                         initialCategory={filters?.category}
                         categories={categories}
                     />
-                    <TransactionForm categories={categories} />
+                    <TransactionForm categories={categories} defaultCurrency={userCurrency} />
                 </div>
             </div>
 
@@ -133,8 +133,8 @@ export default function TransactionList({
                                                     {displayAmount?.toFixed(2)} {userCurrency}
                                                     {t.currency !== userCurrency && (
                                                         <span className="text-gray-400 text-xs ml-1">
-                                ({t.amount} {t.currency})
-                              </span>
+                                                            ({t.amount} {t.currency})
+                                                        </span>
                                                     )}
                                                 </>
                                             )}
@@ -173,17 +173,17 @@ export default function TransactionList({
                                     <div className="flex justify-between items-center">
                                         <span className="text-gray-700 font-medium">{new Date(t.date).toLocaleDateString("nl-NL")}</span>
                                         <span className={`font-semibold ${t.type === "income" ? "text-green-700" : "text-red-700"}`}>
-                      {t.type === "income" ? "Income" : "Expense"}
-                    </span>
+                                          {t.type === "income" ? "Income" : "Expense"}
+                                        </span>
                                     </div>
                                     <div className="flex justify-between text-sm text-gray-600">
                                         <span>Category: {t.category}</span>
                                         <span>
-                      {isLoading ? "Loading..." : `${displayAmount?.toFixed(2)} ${userCurrency}`}
+                                            {isLoading ? "Loading..." : `${displayAmount?.toFixed(2)} ${userCurrency}`}
                                             {t.currency !== userCurrency && !isLoading && (
                                                 <span className="text-gray-400 ml-1">({t.amount} {t.currency})</span>
                                             )}
-                    </span>
+                                        </span>
                                     </div>
                                     {t.description && <div className="text-sm text-gray-700">Desc: {t.description}</div>}
                                     <div className="pt-2 flex justify-end">
@@ -203,10 +203,7 @@ export default function TransactionList({
                 </div>
             </div>
 
-            {/* Paginator */}
             <Paginator page={page} perPage={perPage} totalItems={totalTransactions} />
-
-            {/* Delete Modal */}
             <DeleteModal
                 isOpen={deleteId !== null}
                 transactionId={deleteId || undefined}
