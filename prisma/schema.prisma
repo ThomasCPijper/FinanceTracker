@@ -26,7 +26,9 @@ model Category {
 }
 
 model User {
-  id          Int   @id @default(autoincrement())
-  email       String
-  password    String
+  id              Int      @id @default(autoincrement())
+  email           String
+  password        String
+  primaryCurrency String  @default("EUR")
 }
+

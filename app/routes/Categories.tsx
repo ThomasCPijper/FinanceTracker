@@ -8,10 +8,10 @@ import {getSession} from "~/session.server";
 export async function loader({ request }: LoaderFunctionArgs) {
     const session = await getSession(request);
     const userId = session.get("userId");
-
     if (!userId) {
-        throw new Response("Unauthorized", { status: 401 });
+        throw redirect("/");
     }
+
     const userIdNumber = Number(userId); // ✅ Heel belangrijk: convert naar number
 
     const url = new URL(request.url);

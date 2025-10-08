@@ -43,7 +43,7 @@ export default function LoginPage() {
                   name="email"
                   id="email"
                   required
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
               />
             </div>
             <div>
@@ -55,7 +55,7 @@ export default function LoginPage() {
                   name="password"
                   id="password"
                   required
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
               />
             </div>
 

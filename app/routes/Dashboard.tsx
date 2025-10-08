@@ -5,12 +5,15 @@ import DashboardSummary from "~/components/Transaction/DashboardSummary";
 import TransactionList from "~/components/Transaction/TransactionList";
 import { prisma } from "~/utils/prisma.server";
 import { getSession } from "~/session.server";
+import {convertCurrency} from "~/utils/currency.server";
 
 // ===== Loader =====
 export async function loader({ request }: LoaderFunctionArgs) {
     const session = await getSession(request);
     const userId = session.get("userId");
-    if (!userId) throw new Response("Unauthorized", { status: 401 });
+    if (!userId) {
+        throw redirect("/");
+    }
 
     const userIdNumber = Number(userId);
     const url = new URL(request.url);
@@ -45,6 +48,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
         take: perPage,
     });
 
+    const user = await prisma.user.findUnique({
+        where: { id: Number(userId) },
+        select: { id: true, primaryCurrency: true },
+    });
+    const userCurrency = user?.primaryCurrency || "EUR";
+
     // Aggregate income/expense for this month
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -65,19 +74,20 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
 
     return json({
-        transactions,
+        transactions: transactions,
         totalTransactions,
         totalIncome: totalIncomeAggregate._sum.amount ?? 0,
         totalExpense: totalExpenseAggregate._sum.amount ?? 0,
         page,
         perPage,
-        categories: categories,
+        categories,
         filters: {
             startDate: startDateStr ?? "",
             endDate: endDateStr ?? "",
             category: category ?? "",
             type: type ?? "",
         },
+        userCurrency, // voeg ook deze toe zodat je hem in de lijst kan tonen
     });
 }
 
@@ -114,7 +124,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 // ===== Dashboard component =====
 export default function Dashboard() {
-    const { transactions, categories, page, perPage, totalTransactions, totalIncome, totalExpense, filters } =
+    const { transactions, userCurrency, categories, page, perPage, totalTransactions, totalIncome, totalExpense, filters } =
         useLoaderData<typeof loader>();
 
     return (
@@ -127,6 +137,7 @@ export default function Dashboard() {
                 perPage={perPage}
                 totalTransactions={totalTransactions}
                 filters={filters}
+                userCurrency={userCurrency}
             />
         </div>
     );

@@ -17,7 +17,7 @@ export default function CategoryForm() {
                 placeholder="New category"
                 value={name} // controlled input
                 onChange={(e) => setName(e.target.value)}
-                className="border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                className="border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
             />
             <button
                 type="submit"

@@ -28,7 +28,6 @@ export default function App() {
         </head>
         <body className="text-gray-900">
         <div className="flex flex-col sm:flex-row min-h-screen bg-gray-100">
-            {/* ✅ Only render Navbar if NOT on index page */}
             {!isIndexPage && <Navbar />}
             <main className="flex-1 space-y-8 overflow-y-auto">
                 <Outlet />
