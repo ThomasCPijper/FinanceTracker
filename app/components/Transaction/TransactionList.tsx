@@ -63,7 +63,11 @@ export default function TransactionList({
             const promises = transactions.map(async (t) => {
                 if (t.currency !== userCurrency) {
                     setLoadingIds((prev) => [...prev, t.id]);
-                    const convertedAmount = await convertCurrency(t.currency, userCurrency, t.amount);
+                    const convertedAmount = await convertCurrency(
+                        t.currency,
+                        userCurrency,
+                        t.amount
+                    );
                     newConversions[t.id] = convertedAmount;
                 } else {
                     newConversions[t.id] = t.amount;
@@ -79,19 +83,26 @@ export default function TransactionList({
     }, [transactions, userCurrency]);
 
     return (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 pb-24 sm:pb-6">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <h2 className="text-xl font-semibold text-indigo-600">Transactions</h2>
 
                 <div className="flex flex-wrap gap-2 items-center">
                     <TransactionFilter
-                        initialStart={filters.startDate ? new Date(filters.startDate) : undefined}
-                        initialEnd={filters.endDate ? new Date(filters.endDate) : undefined}
+                        initialStart={
+                            filters.startDate ? new Date(filters.startDate) : undefined
+                        }
+                        initialEnd={
+                            filters.endDate ? new Date(filters.endDate) : undefined
+                        }
                         initialCategory={filters?.category}
                         categories={categories}
                     />
-                    <TransactionForm categories={categories} defaultCurrency={userCurrency} />
+                    <TransactionForm
+                        categories={categories}
+                        defaultCurrency={userCurrency}
+                    />
                 </div>
             </div>
 
@@ -102,12 +113,24 @@ export default function TransactionList({
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50 sticky top-0 z-10">
                         <tr>
-                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">Date</th>
-                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">Type</th>
-                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">Category</th>
-                            <th className="px-4 py-2 text-right text-sm font-medium text-gray-500 uppercase">Amount</th>
-                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">Description</th>
-                            <th className="px-4 py-2 text-center text-sm font-medium text-gray-500 uppercase">Actions</th>
+                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">
+                                Date
+                            </th>
+                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">
+                                Type
+                            </th>
+                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">
+                                Category
+                            </th>
+                            <th className="px-4 py-2 text-right text-sm font-medium text-gray-500 uppercase">
+                                Amount
+                            </th>
+                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase">
+                                Description
+                            </th>
+                            <th className="px-4 py-2 text-center text-sm font-medium text-gray-500 uppercase">
+                                Actions
+                            </th>
                         </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
@@ -121,25 +144,37 @@ export default function TransactionList({
                                         <td className="px-4 py-3 text-sm text-gray-700">
                                             {new Date(t.date).toLocaleDateString("nl-NL")}
                                         </td>
-                                        <td className={`px-4 py-3 text-sm font-medium ${t.type === "income" ? "text-green-700" : "text-red-700"}`}>
+                                        <td
+                                            className={`px-4 py-3 text-sm font-medium ${
+                                                t.type === "income"
+                                                    ? "text-green-700"
+                                                    : "text-red-700"
+                                            }`}
+                                        >
                                             {t.type === "income" ? "Income" : "Expense"}
                                         </td>
-                                        <td className="px-4 py-3 text-sm text-gray-700">{t.category}</td>
+                                        <td className="px-4 py-3 text-sm text-gray-700">
+                                            {t.category}
+                                        </td>
                                         <td className="px-4 py-3 text-sm text-right text-gray-900">
                                             {isLoading ? (
-                                                <span className="text-gray-400 italic">Loading...</span>
+                                                <span className="text-gray-400 italic">
+                            Loading...
+                          </span>
                                             ) : (
                                                 <>
                                                     {displayAmount?.toFixed(2)} {userCurrency}
                                                     {t.currency !== userCurrency && (
                                                         <span className="text-gray-400 text-xs ml-1">
-                                                            ({t.amount} {t.currency})
-                                                        </span>
+                                ({t.amount} {t.currency})
+                              </span>
                                                     )}
                                                 </>
                                             )}
                                         </td>
-                                        <td className="px-4 py-3 text-sm text-gray-700">{t.description}</td>
+                                        <td className="px-4 py-3 text-sm text-gray-700">
+                                            {t.description}
+                                        </td>
                                         <td className="px-4 py-3 text-center">
                                             <button
                                                 onClick={() => setDeleteId(t.id)}
@@ -153,7 +188,10 @@ export default function TransactionList({
                             })
                         ) : (
                             <tr>
-                                <td colSpan={6} className="px-4 py-8 text-center text-gray-400">
+                                <td
+                                    colSpan={6}
+                                    className="px-4 py-8 text-center text-gray-400"
+                                >
                                     No transactions found
                                 </td>
                             </tr>
@@ -169,23 +207,42 @@ export default function TransactionList({
                             const displayAmount = converted[t.id];
                             const isLoading = loadingIds.includes(t.id);
                             return (
-                                <div key={t.id} className="bg-white shadow rounded-lg p-4 flex flex-col gap-1">
+                                <div
+                                    key={t.id}
+                                    className="bg-white shadow rounded-lg p-4 flex flex-col gap-1"
+                                >
                                     <div className="flex justify-between items-center">
-                                        <span className="text-gray-700 font-medium">{new Date(t.date).toLocaleDateString("nl-NL")}</span>
-                                        <span className={`font-semibold ${t.type === "income" ? "text-green-700" : "text-red-700"}`}>
-                                          {t.type === "income" ? "Income" : "Expense"}
-                                        </span>
+                    <span className="text-gray-700 font-medium">
+                      {new Date(t.date).toLocaleDateString("nl-NL")}
+                    </span>
+                                        <span
+                                            className={`font-semibold ${
+                                                t.type === "income"
+                                                    ? "text-green-700"
+                                                    : "text-red-700"
+                                            }`}
+                                        >
+                      {t.type === "income" ? "Income" : "Expense"}
+                    </span>
                                     </div>
                                     <div className="flex justify-between text-sm text-gray-600">
                                         <span>Category: {t.category}</span>
                                         <span>
-                                            {isLoading ? "Loading..." : `${displayAmount?.toFixed(2)} ${userCurrency}`}
+                      {isLoading
+                          ? "Loading..."
+                          : `${displayAmount?.toFixed(2)} ${userCurrency}`}
                                             {t.currency !== userCurrency && !isLoading && (
-                                                <span className="text-gray-400 ml-1">({t.amount} {t.currency})</span>
+                                                <span className="text-gray-400 ml-1">
+                          ({t.amount} {t.currency})
+                        </span>
                                             )}
-                                        </span>
+                    </span>
                                     </div>
-                                    {t.description && <div className="text-sm text-gray-700">Desc: {t.description}</div>}
+                                    {t.description && (
+                                        <div className="text-sm text-gray-700">
+                                            Desc: {t.description}
+                                        </div>
+                                    )}
                                     <div className="pt-2 flex justify-end">
                                         <button
                                             onClick={() => setDeleteId(t.id)}
@@ -198,12 +255,19 @@ export default function TransactionList({
                             );
                         })
                     ) : (
-                        <div className="px-4 py-8 text-center text-gray-400">No transactions found</div>
+                        <div className="px-4 py-8 text-center text-gray-400">
+                            No transactions found
+                        </div>
                     )}
                 </div>
             </div>
 
-            <Paginator page={page} perPage={perPage} totalItems={totalTransactions} />
+            <Paginator
+                page={page}
+                perPage={perPage}
+                totalItems={totalTransactions}
+            />
+
             <DeleteModal
                 isOpen={deleteId !== null}
                 transactionId={deleteId || undefined}
