@@ -112,7 +112,7 @@ export default function Profile() {
                 </section>
 
                 {/* Update Currency */}
-                <section className="border-t pt-6">
+                <section className="border-t pt-5">
                     <h2 className="text-xl font-semibold text-gray-800 mb-4">Primary Currency</h2>
 
                     {actionData?.error && (
@@ -128,7 +128,7 @@ export default function Profile() {
                         <select
                             name="primaryCurrency"
                             defaultValue={user.primaryCurrency || ""}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                            className="w-full bg-white border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
                         >
                             <option value="" disabled>
                                 Select currency...
@@ -159,7 +159,7 @@ export default function Profile() {
                             type="password"
                             name="password"
                             placeholder="Enter new password"
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                            className="w-full border bg-white border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
                         />
                         <button
                             type="submit"

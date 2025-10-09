@@ -101,7 +101,7 @@ export default function TransactionFilter({
                         name="category"
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
-                        className="border rounded p-2"
+                        className="border bg-white rounded p-2"
                     >
                         <option value="">All Categories</option>
                         {categories.map((cat) => (
@@ -117,7 +117,7 @@ export default function TransactionFilter({
                         onChange={(e) =>
                             setType(e.target.value === "" ? "" : (e.target.value as "income" | "expense"))
                         }
-                        className="border rounded p-2"
+                        className="border bg-white rounded p-2"
                     >
                         <option value="">All Types</option>
                         <option value="income">Income</option>
