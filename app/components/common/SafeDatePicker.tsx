@@ -49,6 +49,7 @@ export default function SafeDatePicker({ selected, onChange }: SafeDatePickerPro
                 dateFormat="dd/MM/yyyy"
                 placeholderText="dd/mm/yyyy"
                 className={inputClass}
+                withPortal
             />
             {selected && (
                 <button

@@ -5,7 +5,7 @@ import DashboardSummary from "~/components/Transaction/DashboardSummary";
 import TransactionList from "~/components/Transaction/TransactionList";
 import { prisma } from "~/utils/prisma.server";
 import { getSession } from "~/session.server";
-import {convertCurrency} from "~/utils/currency.server";
+import {Transaction} from "@prisma/client";
 
 // ===== Loader =====
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -87,7 +87,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
             category: category ?? "",
             type: type ?? "",
         },
-        userCurrency, // voeg ook deze toe zodat je hem in de lijst kan tonen
+        userCurrency,
     });
 }
 
@@ -99,7 +99,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
     switch (intent) {
         case "create-transaction": {
-            const userId = session.get("userId") as string;
+            const userId = session.get("userId") as number;
             const amount = parseFloat(formData.get("amount") as string);
             const currency = formData.get("currency") as string;
             const category = formData.get("category") as string;
@@ -124,11 +124,18 @@ export async function action({ request }: ActionFunctionArgs) {
 
 // ===== Dashboard component =====
 export default function Dashboard() {
-    const { transactions, userCurrency, categories, page, perPage, totalTransactions, totalIncome, totalExpense, filters } =
+    const { transactions: rawTransactions, userCurrency, categories, page, perPage, totalTransactions, totalIncome, totalExpense, filters } =
         useLoaderData<typeof loader>();
 
+    const transactions: Transaction[] = rawTransactions.map((t) => ({
+        ...t,
+        type: t.type as "income" | "expense",
+        date: new Date(t.date),
+        createdAt: new Date(t.createdAt),
+    }));
+
     return (
-        <div className="h-[100vh] p-8 flex flex-col gap-6">
+        <div className="p-8 flex flex-col gap-6">
             <DashboardSummary totalIncome={totalIncome} totalExpense={totalExpense} />
             <TransactionList
                 categories={categories}

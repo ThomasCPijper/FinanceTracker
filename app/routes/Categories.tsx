@@ -46,7 +46,6 @@ export async function action({ request }: ActionFunctionArgs) {
     switch (intent) {
         case "create-category": {
             const userId = session.get("userId") as string;
-            const currency = formData.get("currency") as string;
             const name = formData.get("name") as string;
 
             await prisma.category.create({ data: { userId, name } });

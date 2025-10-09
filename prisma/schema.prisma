@@ -15,7 +15,7 @@ model Transaction {
   category    String
   type        String
   date        DateTime
-  description String?
+  description String
   createdAt   DateTime @default(now())
 }
 

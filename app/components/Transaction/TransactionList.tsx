@@ -4,16 +4,7 @@ import DeleteModal from "~/components/common/DeleteModal";
 import Paginator from "~/components/common/Paginator";
 import TransactionFilter from "~/components/Transaction/TransactionFilter";
 import { Category } from "@prisma/client";
-
-interface Transaction {
-    id: number;
-    date: string;
-    type: "income" | "expense";
-    category: string;
-    amount: number;
-    currency: string;
-    description: string;
-}
+import {Transaction} from "~/components/Transaction/Transaction";
 
 interface TransactionListProps {
     transactions: Transaction[];

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import SafeDatePicker from "~/components/common/SafeDatePicker";
 import { Category } from "@prisma/client";
+import { Form } from "@remix-run/react";
 
 interface TransactionFilterProps {
     initialStart?: Date;
@@ -66,7 +67,7 @@ export default function TransactionFilter({
     }, [open]);
 
     return (
-        <div className="relative inline-block text-left">
+        <Form method="get" className="relative inline-block text-left">
             <button
                 ref={buttonRef}
                 type="button"
@@ -80,10 +81,7 @@ export default function TransactionFilter({
                 <div
                     ref={dropdownRef}
                     className="fixed w-72 max-w-[90vw] bg-white shadow-lg border border-gray-200 rounded-lg p-4 flex flex-col gap-3 z-[9999] max-h-[80vh] overflow-y-auto"
-                    style={{
-                        top: dropdownPos.top,
-                        left: dropdownPos.left,
-                    }}
+                    style={{ top: dropdownPos.top, left: dropdownPos.left }}
                 >
                     <SafeDatePicker selected={startDate} onChange={setStartDate} />
                     <input
@@ -103,7 +101,7 @@ export default function TransactionFilter({
                         name="category"
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
-                        className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
+                        className="border rounded p-2"
                     >
                         <option value="">All Categories</option>
                         {categories.map((cat) => (
@@ -119,7 +117,7 @@ export default function TransactionFilter({
                         onChange={(e) =>
                             setType(e.target.value === "" ? "" : (e.target.value as "income" | "expense"))
                         }
-                        className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
+                        className="border rounded p-2"
                     >
                         <option value="">All Types</option>
                         <option value="income">Income</option>
@@ -134,6 +132,6 @@ export default function TransactionFilter({
                     </button>
                 </div>
             )}
-        </div>
+        </Form>
     );
 }
